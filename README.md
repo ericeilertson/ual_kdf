@@ -1,0 +1,1 @@
+A simple Python script to demonstrate the construction of a KMAC-256 based KDF for the Ultra Accelerator Link 1.0 specification.  This is based on the [NIST Special Publication 800-56C rev2](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Cr2.pdf).
