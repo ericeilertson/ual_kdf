@@ -36,7 +36,6 @@ def derive_kmac_kdf(secret_key: bytes, fixed_info: bytes, output_length_bits: in
     return kmac.digest()
 
 if __name__ == "__main__":
-    # Example UAL parameters
     secret_key = b"12345678901234567890123456789012"  # 256 bits / 32 bytes
 
     for epoch in range(5):
