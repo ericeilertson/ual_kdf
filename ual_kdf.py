@@ -22,6 +22,8 @@ def derive_kmac_kdf(secret_key: bytes, fixed_info: bytes, output_length_bits: in
     Since the UAL spec requires a 256-bit output this implementation skips the calculation of how many rounds of KMAC
     is needed as it is known to be 1.
     """
+    if len(secret_key) != 32:
+        raise ValueError("secret_key must be exactly 32 bytes (256 bits)")
 
     # Prepare counter and input buffer
     counter = 1  # counter for how many rounds of KMAC is needed but UAL parameters require only 1 round
@@ -41,6 +43,6 @@ if __name__ == "__main__":
         for stream_id in range(3):
             fixed_info = construct_fixed_info(epoch, stream_id)
             derived_key = derive_kmac_kdf(secret_key, fixed_info)
-            print(f"The key for epoch {epoch} and stream_id is {stream_id} is {derived_key.hex()}")
+            print(f"The key for epoch {epoch} and stream_id {stream_id} is {derived_key.hex()}")
 
 
