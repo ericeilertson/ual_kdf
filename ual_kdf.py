@@ -1,7 +1,6 @@
 from Crypto.Hash import KMAC256
 
 SALT_LENGTH_BYTES = 132
-KDF_OUTPUT_LENGTH_BITS = 256
 
 def construct_fixed_info(epoch: int, stream_id: int) -> bytes:
     """
@@ -15,7 +14,7 @@ def construct_fixed_info(epoch: int, stream_id: int) -> bytes:
     fixed_info += stream_id.to_bytes(1, byteorder="big")
     return fixed_info
 
-def derive_kmac_kdf(secret_key: bytes, fixed_info: bytes, output_length_bits: int = KDF_OUTPUT_LENGTH_BITS) -> bytes:
+def derive_kmac_kdf(secret_key: bytes, fixed_info: bytes) -> bytes:
     """
     Derive a key using KMAC256 following NIST.SP.800-56Cr2 spec, Option 3.
     https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Cr2.pdf
@@ -32,7 +31,7 @@ def derive_kmac_kdf(secret_key: bytes, fixed_info: bytes, output_length_bits: in
 
     # Use 132-byte all-zero salt as per "default salt" recommendation
     salt = bytes(SALT_LENGTH_BYTES)
-    kmac = KMAC256.new(key=salt, data=input_buffer, custom=b"KDF", mac_len=output_length_bits // 8)
+    kmac = KMAC256.new(key=salt, data=input_buffer, custom=b"KDF", mac_len=32)
     return kmac.digest()
 
 if __name__ == "__main__":
