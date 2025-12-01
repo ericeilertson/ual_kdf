@@ -6,7 +6,7 @@ from typing import Iterable, List
 from ual_kdf import construct_fixed_info, derive_kmac_kdf
 
 DEFAULT_SECRET = "12345678901234567890123456789012"
-DEFAULT_EPOCHS = [0, 1, 2, 1000000, 1000000000, 0xffffffff]
+DEFAULT_EPOCHS = [0, 1, 2, 3, 1000000, 1000000000, 0xffffffff]
 DEFAULT_STREAMS = (0, 1, 2)
 
 
@@ -17,7 +17,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--secret",
         default=DEFAULT_SECRET,
-        help="32-byte secret key in ASCII or hex (prefix with 0x)",
+        help="32-byte secret key in ASCII or hex (prefix with 0x). Stored in each vector entry.",
     )
     parser.add_argument(
         "--epochs",
@@ -49,6 +49,7 @@ def _load_secret(secret_arg: str) -> bytes:
 
 
 def _iter_vectors(secret: bytes, epochs: Iterable[int], streams: Iterable[int]):
+    secret_hex = secret.hex()
     for epoch in epochs:
         for stream_id in streams:
             fixed_info = construct_fixed_info(epoch, stream_id)
@@ -56,6 +57,7 @@ def _iter_vectors(secret: bytes, epochs: Iterable[int], streams: Iterable[int]):
             yield {
                 "epoch": epoch,
                 "stream_id": stream_id,
+                "secret": secret_hex,
                 "fixed_info": fixed_info.hex(),
                 "derived_key": derived_key.hex(),
             }

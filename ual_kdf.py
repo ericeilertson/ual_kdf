@@ -10,9 +10,8 @@ def construct_fixed_info(epoch: int, stream_id: int, show_bits=False) -> bytes:
     """
     if stream_id not in (0, 1, 2):
         raise ValueError(f"stream_id must be 0, 1, or 2")
-    if epoch > 2**32:
-        print(f"epoch={epoch}, stream_id={stream_id}, show_bits={show_bits}")
-        raise ValueError(f"epoch must be less than 2^32")
+    if not (0 <= epoch <= 0xFFFFFFFF):
+        raise ValueError("epoch must fit within 32 bits")
     fixed_info = epoch.to_bytes(4, byteorder="big")
     fixed_info += stream_id.to_bytes(1, byteorder="big")
     if show_bits:
@@ -46,8 +45,10 @@ def derive_kmac_kdf(secret_key: bytes, fixed_info: bytes, show_bits=False) -> by
 if __name__ == "__main__":
     secret_key = b"12345678901234567890123456789012"  # 256 bits / 32 bytes
 
-    for epoch in range(5):
+    epochs = [0, 1, 2, 1000000, 1000000000, 0xffffffff]
+    show_bits = True
+    for epoch in epochs:
         for stream_id in range(3):
-            fixed_info = construct_fixed_info(epoch, stream_id, show_bits=False)
-            derived_key = derive_kmac_kdf(secret_key, fixed_info, show_bits=False)
+            fixed_info = construct_fixed_info(epoch, stream_id, show_bits=show_bits)
+            derived_key = derive_kmac_kdf(secret_key, fixed_info, show_bits=show_bits)
             print(f"The key for epoch {epoch} and stream_id {stream_id} is {derived_key.hex()}")
